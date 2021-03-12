@@ -1,0 +1,5 @@
+EMD-signal
+pandas
+matplotlib
+tqdm
+scikit-learn
