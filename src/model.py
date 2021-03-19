@@ -14,23 +14,23 @@ class PrintLayer(Module):
 
 class CNN(Module):
     def __init__(self, in_size):
-        super().__init__()
-        
-        self.conv1 = Conv1d(1, 64, kernel_size=100, stride=50)
+        super().__init__()        
+        #self.conv1 = Conv1d(in_size[1], 64, kernel_size=100, stride=50)
+        self.conv1 = Conv1d(in_size[1], 64, kernel_size=4, stride=2)
         self.mp1 = MaxPool1d(kernel_size=2, stride=2)
         self.conv2 = Conv1d(64, 64, kernel_size=2, stride=1)
         self.mp2 = MaxPool1d(kernel_size=2, stride=2)
-        self.fc1= Linear(768,100)
+        self.get_linear_size(torch.rand(in_size))
+        self.fc1= Linear(self.linear_in_size,100)
         self.fc2 = Linear(100,1)
         #self.print_layer = PrintLayer()
-        self.get_linear_size(torch.rand(in_size))
-    
+        
     def get_linear_size(self, x):
         x = self.conv1(x)
         x = relu(self.mp1(x))
         x = self.conv2(x)
         x = relu(self.mp2(x))
-        self.in_size = x.numel()
+        self.linear_in_size = x.numel()
         
     def forward(self, x):
     
@@ -43,7 +43,7 @@ class CNN(Module):
         #x = self.print_layer(x)
         x = relu(self.mp2(x))
         #x = self.print_layer(x)
-        x = x.view(-1, self.in_size)
+        x = x.view(-1, self.linear_in_size)
         #x = self.print_layer(x)
         x = self.fc1(x)
         #x = self.print_layer(x)
@@ -52,10 +52,10 @@ class CNN(Module):
         return x
         
 if __name__ == "__main__":
-    in_tensor = torch.rand((1, 1, 2560))
-    model = CNN((1, 1, 2560))
-    model(in_tensor)
-    
+    in_tensor = torch.rand((20, 2, 2560))
+    model = CNN((1, 2, 2560))
+    out_tensor = model(in_tensor)
+    print(out_tensor.shape)
     """
     torch.Size([1, 1, 2560])
     torch.Size([1, 64, 51])
